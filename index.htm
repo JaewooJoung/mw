@@ -64,9 +64,6 @@
         }
         
         .file-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             padding: 15px 20px;
             border-bottom: 1px solid #eee;
             transition: background-color 0.2s;
@@ -84,17 +81,11 @@
             text-decoration: none;
             color: #0066cc;
             font-weight: 500;
-            flex-grow: 1;
+            display: block;
         }
         
         .file-item a:hover {
             text-decoration: underline;
-        }
-        
-        .file-date {
-            color: #666;
-            font-size: 14px;
-            white-space: nowrap;
         }
         
         .loading {
@@ -121,16 +112,6 @@
     </div>
 
     <script>
-        // Function to format date
-        function formatDate(dateString) {
-            const date = new Date(dateString);
-            return date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-        }
-
         // Function to render files
         function renderFiles(files) {
             const content = document.getElementById('content');
@@ -143,7 +124,6 @@
             const fileListHTML = files.map(file => `
                 <div class="file-item">
                     <a href="${file.link}">${file.name}</a>
-                    <span class="file-date">${formatDate(file.modified)}</span>
                 </div>
             `).join('');
             
