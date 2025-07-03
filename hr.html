@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Employee Data Manager</title>
+    <style>
+        .login-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .login-box h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 2em;
+        }
+
+        .login-box p {
+            color: #7f8c8d;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .login-form input {
+            padding: 15px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .login-form button {
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .login-form button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .login-form button:active {
+            transform: translateY(0);
+        }
+
+        .login-error {
+            color: #e74c3c;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin-top: 15px;
+            font-weight: 600;
+        }
+
+        .header-with-logout {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logout-btn {
+            padding: 10px 20px;
+            background: linear-gradient(45deg, #e74c3c, #c0392b);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .search-filters {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 15px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #34495e;
+            font-size: 14px;
+        }
+
+        input, select {
+            padding: 12px;
+            border: 2px solid #e0e6ed;
+            border-radius: 10px;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .results-info {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .table-container {
+            overflow-x: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 15px 10px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 13px;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        td {
+            padding: 12px 10px;
+            border-bottom: 1px solid #e0e6ed;
+            font-size: 12px;
+            transition: background-color 0.3s ease;
+        }
+
+        tr:hover {
+            background: linear-gradient(45deg, rgba(102, 126, 234, 0.1), rgba(118, 75, 162, 0.1));
+            transform: scale(1.01);
+            transition: all 0.3s ease;
+        }
+
+        .employee-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .employee-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .employee-name {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .employee-title {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .card-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .view-toggle {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .toggle-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+
+        @media (max-width: 768px) {
+            .search-filters {
+                grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 15px;
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-container">
+        <div class="login-box">
+            <h2>🔐 Login Required</h2>
+            <p>Please enter the password to access employee data</p>
+            <div class="login-form">
+                <input type="password" id="passwordInput" placeholder="Enter password" maxlength="20">
+                <button onclick="login()" id="loginBtn">Login</button>
+            </div>
+            <div id="loginError" class="login-error" style="display: none;">
+                ❌ Incorrect password. Please try again.
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Application (hidden initially) -->
+    <div id="mainApp" class="container" style="display: none;">
+        <div class="header-with-logout">
+            <h1>🏢 Employee Data Manager</h1>
+            <button onclick="logout()" class="logout-btn">Logout</button>
+        </div>
+        
+        <div class="search-filters">
+            <div class="search-group">
+                <label for="searchInput">Search All Fields</label>
+                <input type="text" id="searchInput" placeholder="Search employees...">
+            </div>
+            
+            <div class="search-group">
+                <label for="lobFilter">Line of Business</label>
+                <select id="lobFilter">
+                    <option value="">All LOBs</option>
+                </select>
+            </div>
+            
+            <div class="search-group">
+                <label for="companyFilter">Company</label>
+                <select id="companyFilter">
+                    <option value="">All Companies</option>
+                </select>
+            </div>
+            
+            <div class="search-group">
+                <label for="locationFilter">Location</label>
+                <select id="locationFilter">
+                    <option value="">All Locations</option>
+                </select>
+            </div>
+            
+            <div class="search-group">
+                <label for="genderFilter">Gender</label>
+                <select id="genderFilter">
+                    <option value="">All Genders</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
+            </div>
+            
+            <div class="search-group">
+                <label for="typeFilter">Type of Work</label>
+                <select id="typeFilter">
+                    <option value="">All Types</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="view-toggle">
+            <button class="toggle-btn active" onclick="toggleView('table')">Table View</button>
+            <button class="toggle-btn" onclick="toggleView('card')">Card View</button>
+        </div>
+
+        <div class="results-info" id="resultsInfo">
+            Showing 0 of 0 employees
+        </div>
+
+        <div id="tableView" class="table-container">
+            <table id="employeeTable">
+                <thead>
+                    <tr>
+                        <th>Emp ID</th>
+                        <th>Name</th>
+                        <th>Title</th>
+                        <th>LOB</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Manager</th>
+                        <th>Company</th>
+                        <th>End Date</th>
+                        <th>Project Code</th>
+                        <th>Location</th>
+                        <th>Customer Manager</th>
+                        <th>Type of Work</th>
+                        <th>Gender</th>
+                    </tr>
+                </thead>
+                <tbody id="employeeTableBody">
+                </tbody>
+            </table>
+        </div>
+
+        <div id="cardView" style="display: none;">
+            <div id="employeeCards"></div>
+        </div>
+    </div>
+
+    <script>
+        // JSON data structure
+        const employeeData = [
+            {
+                "empId": "1",
+                "firstName": "Jaewoo",
+                "lastName": "Joung",
+                "title": "SQE",
+                "lob": "ESS",
+                "email": "Jaewoo.Joung@tatatechnologies.com",
+                "phone": "073-500 32 75",
+                "customerEmail": "",
+                "manager": "Vinodh Kumar",
+                "currentCustomer": "Volvo Group",
+                "groupCompany": "Volvo Trucks",
+                "endDate": "6/30/2025",
+                "roleDescription": "Supplier Quality Engineer_Lead",
+                "projectCode": "DP158516",
+                "location": "GC",
+                "customerManager": "Tobias Emriksson",
+                "customerManagerEmail": "tobias.emriksson@volvo.com",
+                "customerManagerPhone": "+46 765 531657",
+                "typeOfWork": "TM",
+                "typeOfEmployment": "Employee",
+                "gender": "Male",
+                "oneOnOneMeetings": "Yes"
+            },
+            {
+                "empId": "2",
+                "firstName": "Anand",
+                "lastName": "Shelke",
+                "title": "HIL Engineer",
+                "lob": "ESS",
+                "email": "Anandmadhukar.Shelke@tatatechnologies.com",
+                "phone": "+46 731 47 52 72",
+                "customerEmail": "",
+                "manager": "Jaewoo Joung",
+                "currentCustomer": "Volvo Group",
+                "groupCompany": "Volvo Trucks",
+                "endDate": "7/18/2025",
+                "roleDescription": "Test Rig Development Engineer_Specialist",
+                "projectCode": "DP154284",
+                "location": "O2",
+                "customerManager": "Anders Nilsson",
+                "customerManagerEmail": "anders.nilsson.5@volvo.com",
+                "customerManagerPhone": "",
+                "typeOfWork": "TM",
+                "typeOfEmployment": "Deputee",
+                "gender": "Male",
+                "oneOnOneMeetings": "Yes"
+            },
+            {
+                "empId": "52750",
+                "firstName": "Pratik",
+                "lastName": "Patil",
+                "title": "",
+                "lob": "ESS",
+                "email": "Pratik.Patil@tatatechnologies.com",
+                "phone": "+46 700 90 24 26",
+                "customerEmail": "",
+                "manager": "Jaewoo Joung",
+                "currentCustomer": "Volvo Group",
+                "groupCompany": "Volvo Trucks",
+                "endDate": "5/31/2025",
+                "roleDescription": "ADAS Embedded Software Application Engineer A_Level 3",
+                "projectCode": "DP159659",
+                "location": "GC",
+                "customerManager": "Stina Käll",
+                "customerManagerEmail": "stina.kall@volvo.com",
+                "customerManagerPhone": "",
+                "typeOfWork": "TM",
+                "typeOfEmployment": "Deputee",
+                "gender": "Male",
+                "oneOnOneMeetings": "Yes"
+            },
+            {
+                "empId": "54662",
+                "firstName": "Shanmuga",
+                "lastName": "KN",
+                "title": "HIL Engineer",
+                "lob": "ESS",
+                "email": "K.Siva@tatatechnologies.com",
+                "phone": "703027187",
+                "customerEmail": "",
+                "manager": "Jaewoo Joung",
+                "currentCustomer": "Volvo Group",
+                "groupCompany": "Volvo Buses",
+                "endDate": "12/31/2025",
+                "roleDescription": "Test Rig Development Engineer_Senior",
+                "projectCode": "DP159658",
+                "location": "Arendal",
+                "customerManager": "Lena Sjöberg",
+                "customerManagerEmail": "lena.sjoberg@volvo.com",
+                "customerManagerPhone": "",
+                "typeOfWork": "TM",
+                "typeOfEmployment": "Deputee",
+                "gender": "Male",
+                "oneOnOneMeetings": "Yes"
+            }
+        ];
+
+        let filteredData = [...employeeData];
+        let currentView = 'table';
+        let isLoggedIn = false;
+
+        // Login function
+        function login() {
+            const password = document.getElementById('passwordInput').value;
+            const errorDiv = document.getElementById('loginError');
+            
+            if (password === '1234') {
+                isLoggedIn = true;
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainApp').style.display = 'block';
+                init();
+            } else {
+                errorDiv.style.display = 'block';
+                document.getElementById('passwordInput').value = '';
+                document.getElementById('passwordInput').focus();
+            }
+        }
+
+        // Logout function
+        function logout() {
+            isLoggedIn = false;
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('mainApp').style.display = 'none';
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+
+        // Add Enter key support for login
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        });
+
+        let filteredData = [...employeeData];
+        let currentView = 'table';
+
+        // Initialize the application
+        function init() {
+            if (!isLoggedIn) return;
+            populateFilters();
+            displayData();
+            setupEventListeners();
+        }
+
+        // Populate filter dropdowns
+        function populateFilters() {
+            if (!isLoggedIn) return;
+            const lobs = [...new Set(employeeData.map(emp => emp.lob))].filter(Boolean);
+            const companies = [...new Set(employeeData.map(emp => emp.groupCompany))].filter(Boolean);
+            const locations = [...new Set(employeeData.map(emp => emp.location))].filter(Boolean);
+            const types = [...new Set(employeeData.map(emp => emp.typeOfWork))].filter(Boolean);
+
+            populateSelect('lobFilter', lobs);
+            populateSelect('companyFilter', companies);
+            populateSelect('locationFilter', locations);
+            populateSelect('typeFilter', types);
+        }
+
+        function populateSelect(selectId, options) {
+            const select = document.getElementById(selectId);
+            options.forEach(option => {
+                const optionElement = document.createElement('option');
+                optionElement.value = option;
+                optionElement.textContent = option;
+                select.appendChild(optionElement);
+            });
+        }
+
+        // Setup event listeners
+        function setupEventListeners() {
+            document.getElementById('searchInput').addEventListener('input', filterData);
+            document.getElementById('lobFilter').addEventListener('change', filterData);
+            document.getElementById('companyFilter').addEventListener('change', filterData);
+            document.getElementById('locationFilter').addEventListener('change', filterData);
+            document.getElementById('genderFilter').addEventListener('change', filterData);
+            document.getElementById('typeFilter').addEventListener('change', filterData);
+        }
+
+        // Filter data based on search criteria
+        function filterData() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const lobFilter = document.getElementById('lobFilter').value;
+            const companyFilter = document.getElementById('companyFilter').value;
+            const locationFilter = document.getElementById('locationFilter').value;
+            const genderFilter = document.getElementById('genderFilter').value;
+            const typeFilter = document.getElementById('typeFilter').value;
+
+            filteredData = employeeData.filter(employee => {
+                // Search in all fields
+                const matchesSearch = !searchTerm || Object.values(employee).some(value => 
+                    value.toString().toLowerCase().includes(searchTerm)
+                );
+
+                // Filter by specific criteria
+                const matchesLob = !lobFilter || employee.lob === lobFilter;
+                const matchesCompany = !companyFilter || employee.groupCompany === companyFilter;
+                const matchesLocation = !locationFilter || employee.location === locationFilter;
+                const matchesGender = !genderFilter || employee.gender === genderFilter;
+                const matchesType = !typeFilter || employee.typeOfWork === typeFilter;
+
+                return matchesSearch && matchesLob && matchesCompany && matchesLocation && matchesGender && matchesType;
+            });
+
+            displayData();
+        }
+
+        // Display data in current view
+        function displayData() {
+            updateResultsInfo();
+            if (currentView === 'table') {
+                displayTableView();
+            } else {
+                displayCardView();
+            }
+        }
+
+        // Update results information
+        function updateResultsInfo() {
+            const resultsInfo = document.getElementById('resultsInfo');
+            resultsInfo.textContent = `Showing ${filteredData.length} of ${employeeData.length} employees`;
+        }
+
+        // Display table view
+        function displayTableView() {
+            const tbody = document.getElementById('employeeTableBody');
+            tbody.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                const row = tbody.insertRow();
+                const cell = row.insertCell();
+                cell.colSpan = 14;
+                cell.className = 'no-results';
+                cell.textContent = 'No employees found matching your criteria';
+                return;
+            }
+
+            filteredData.forEach(employee => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${employee.empId}</td>
+                    <td>${employee.firstName} ${employee.lastName}</td>
+                    <td>${employee.title}</td>
+                    <td>${employee.lob}</td>
+                    <td>${employee.email}</td>
+                    <td>${employee.phone}</td>
+                    <td>${employee.manager}</td>
+                    <td>${employee.groupCompany}</td>
+                    <td>${employee.endDate}</td>
+                    <td>${employee.projectCode}</td>
+                    <td>${employee.location}</td>
+                    <td>${employee.customerManager}</td>
+                    <td>${employee.typeOfWork}</td>
+                    <td>${employee.gender}</td>
+                `;
+            });
+        }
+
+        // Display card view
+        function displayCardView() {
+            const cardsContainer = document.getElementById('employeeCards');
+            cardsContainer.innerHTML = '';
+
+            if (filteredData.length === 0) {
+                cardsContainer.innerHTML = '<div class="no-results">No employees found matching your criteria</div>';
+                return;
+            }
+
+            filteredData.forEach(employee => {
+                const card = document.createElement('div');
+                card.className = 'employee-card';
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div>
+                            <div class="employee-name">${employee.firstName} ${employee.lastName}</div>
+                            <div class="employee-title">${employee.title} - ${employee.lob}</div>
+                        </div>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <div class="detail-label">Employee ID</div>
+                            <div class="detail-value">${employee.empId}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Email</div>
+                            <div class="detail-value">${employee.email}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Phone</div>
+                            <div class="detail-value">${employee.phone}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Manager</div>
+                            <div class="detail-value">${employee.manager}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Company</div>
+                            <div class="detail-value">${employee.groupCompany}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">End Date</div>
+                            <div class="detail-value">${employee.endDate}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Role</div>
+                            <div class="detail-value">${employee.roleDescription}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Project Code</div>
+                            <div class="detail-value">${employee.projectCode}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Location</div>
+                            <div class="detail-value">${employee.location}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Customer Manager</div>
+                            <div class="detail-value">${employee.customerManager}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Type of Work</div>
+                            <div class="detail-value">${employee.typeOfWork}</div>
+                        </div>
+                        <div class="detail-item">
+                            <div class="detail-label">Gender</div>
+                            <div class="detail-value">${employee.gender}</div>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.appendChild(card);
+            });
+        }
+
+        // Toggle between table and card views
+        function toggleView(view) {
+            currentView = view;
+            
+            // Update button states
+            document.querySelectorAll('.toggle-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide views
+            if (view === 'table') {
+                document.getElementById('tableView').style.display = 'block';
+                document.getElementById('cardView').style.display = 'none';
+            } else {
+                document.getElementById('tableView').style.display = 'none';
+                document.getElementById('cardView').style.display = 'block';
+            }
+            
+            displayData();
+        }
+
+        // Initialize the application when page loads
+        window.onload = function() {
+            // Show login screen first
+            document.getElementById('loginScreen').style.display = 'flex';
+            document.getElementById('passwordInput').focus();
+        };
+    </script>
+</body>
+</html>
