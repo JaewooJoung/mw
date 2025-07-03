@@ -1,0 +1,1104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Travel Allowance Calculator</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        h2 {
+            color: #34495e;
+            margin: 20px 0;
+            font-size: 1.8em;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 600;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e0e0e0;
+            border-radius: 5px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin: 10px 5px;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .travel-time-table, .allowance-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .travel-time-table th, .travel-time-table td,
+        .allowance-table th, .allowance-table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+
+        .travel-time-table th, .allowance-table th {
+            background: #3498db;
+            color: white;
+            font-weight: 600;
+        }
+
+        .travel-time-table tr:nth-child(even),
+        .allowance-table tr:nth-child(even) {
+            background: #f2f2f2;
+        }
+
+        .travel-time-table tr:hover,
+        .allowance-table tr:hover {
+            background: #e8f4f8;
+        }
+
+        .summary {
+            background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .summary h3 {
+            margin-bottom: 10px;
+            font-size: 1.5em;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 1.1em;
+        }
+
+        .total {
+            font-size: 1.3em;
+            font-weight: bold;
+            border-top: 2px solid white;
+            padding-top: 10px;
+            margin-top: 10px;
+        }
+
+        .day-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .day-input input {
+            width: auto;
+            flex: 1;
+        }
+
+        .meal-deductions {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+        }
+
+        .remove-btn {
+            background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+            padding: 5px 15px;
+            font-size: 14px;
+        }
+
+        .remove-btn:hover {
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        #locationSelect {
+            margin-bottom: 10px;
+        }
+
+        .location-info {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 2em;
+            }
+
+            .meal-deductions {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Printable Report Styles */
+        .printable-report {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: white;
+            z-index: 1000;
+            overflow-y: auto;
+            padding: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .report-header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 20px;
+        }
+
+        .company-logo {
+            margin-bottom: 20px;
+        }
+
+        .report-header h1 {
+            color: #2c3e50;
+            margin: 10px 0;
+            font-size: 2.5em;
+        }
+
+        .report-date {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        .report-info {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+
+        .info-row .label {
+            font-weight: 600;
+            color: #555;
+        }
+
+        .report-section {
+            margin: 30px 0;
+        }
+
+        .report-section h2 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .report-table {
+            width: 100%;
+            border-collapse: collapse;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .report-table th {
+            background: #3498db;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .report-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .report-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .report-table .total-row {
+            font-weight: bold;
+            background: #e8f4f8;
+            border-top: 2px solid #3498db;
+        }
+
+        .report-summary {
+            margin-top: 40px;
+        }
+
+        .summary-box {
+            background: linear-gradient(135deg, #f5f7fa 0%, #e8f4f8 100%);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 18px;
+        }
+
+        .summary-line.total {
+            border-top: 3px solid #2c3e50;
+            padding-top: 15px;
+            margin-top: 20px;
+            font-size: 22px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .report-footer {
+            margin-top: 60px;
+            page-break-inside: avoid;
+        }
+
+        .signature-section {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 40px;
+        }
+
+        .signature-box {
+            text-align: center;
+            width: 250px;
+        }
+
+        .signature-line {
+            border-bottom: 2px solid #333;
+            margin-bottom: 10px;
+            height: 40px;
+        }
+
+        .signature-box p {
+            margin: 5px 0;
+            color: #555;
+        }
+
+        .print-button, .close-button {
+            margin: 20px 10px;
+            position: relative;
+            display: inline-block;
+        }
+
+        .close-button {
+            background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%);
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+
+            .printable-report, .printable-report * {
+                visibility: visible;
+            }
+
+            .printable-report {
+                position: absolute;
+                left: 0;
+                top: 0;
+                padding: 20px;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .report-table {
+                box-shadow: none;
+            }
+
+            .summary-box {
+                box-shadow: none;
+                border: 2px solid #3498db;
+            }
+
+            @page {
+                margin: 0.5in;
+                size: A4;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Travel Allowance Calculator</h1>
+        
+        <div class="section">
+            <h2>Travel Information</h2>
+            <div class="input-group">
+                <label for="companyName">Company Name</label>
+                <input type="text" id="companyName" placeholder="e.g., BW, Acme Corp">
+            </div>
+            
+            <div class="input-group">
+                <label for="locationSelect">Travel Destination</label>
+                <select id="locationSelect">
+                    <option value="">Select a country...</option>
+                </select>
+                <div class="location-info" id="locationInfo"></div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Travel Time Calculation</h2>
+            <div class="input-group">
+                <label for="departureTime">Departure Time</label>
+                <input type="datetime-local" id="departureTime">
+            </div>
+            
+            <div class="input-group">
+                <label for="arrivalTime">Arrival Time</label>
+                <input type="datetime-local" id="arrivalTime">
+            </div>
+            
+            <div class="input-group">
+                <label for="comment">Comment</label>
+                <input type="text" id="comment" placeholder="Optional comment">
+            </div>
+            
+            <button onclick="addTravelTime()">Add Travel Time</button>
+            
+            <table class="travel-time-table" id="travelTimeTable">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                        <th>Travel Time (hours - 8h work)</th>
+                        <th>Amount (250 SEK/h)</th>
+                        <th>Comment</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="travelTimeBody">
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="4"><strong>Total</strong></td>
+                        <td colspan="3"><strong id="travelTimeTotal">0 SEK</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>Daily Allowance</h2>
+            <div id="dailyAllowanceInputs">
+            </div>
+            <button onclick="addDay()">Add Day</button>
+            <button onclick="calculateAllowance()">Calculate Allowance</button>
+            
+            <table class="allowance-table" id="allowanceTable" style="display:none;">
+                <thead>
+                    <tr>
+                        <th>Day</th>
+                        <th>Date</th>
+                        <th>Full/Half Day</th>
+                        <th>Base Amount (SEK)</th>
+                        <th>Breakfast (-15%)</th>
+                        <th>Lunch (-35%)</th>
+                        <th>Dinner (-35%)</th>
+                        <th>Net Amount (SEK)</th>
+                    </tr>
+                </thead>
+                <tbody id="allowanceBody">
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <td colspan="7"><strong>Total Allowance</strong></td>
+                        <td><strong id="allowanceTotal">0 SEK</strong></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="summary" id="summary" style="display:none;">
+            <h3>Summary</h3>
+            <div class="summary-item">
+                <span>Travel Time:</span>
+                <span id="summaryTravelTime">0 SEK</span>
+            </div>
+            <div class="summary-item">
+                <span>Travel Allowance:</span>
+                <span id="summaryAllowance">0 SEK</span>
+            </div>
+            <div class="summary-item total">
+                <span>Total:</span>
+                <span id="summaryTotal">0 SEK</span>
+            </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+            <button onclick="saveToJSON()">Save Location Data to loc.json</button>
+            <button onclick="exportCalculation()">Export Calculation</button>
+            <button onclick="generateReport()">Generate Printable Report</button>
+        </div>
+    </div>
+
+    <!-- Printable Report Section -->
+    <div id="printableReport" class="printable-report" style="display: none;">
+        <div class="report-header">
+            <img src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 24 24' fill='none' stroke='%232c3e50' stroke-width='2'%3E%3Cpath d='M21 12L3 3v6l8 2-8 2v6l18-9z'/%3E%3C/svg%3E" alt="Travel Logo" class="company-logo">
+            <h1>Travel Expense Report</h1>
+            <div class="report-date">Generated: <span id="reportDate"></span></div>
+        </div>
+        
+        <div class="report-info">
+            <div class="info-row">
+                <span class="label">Trip:</span>
+                <span id="reportTripName"></span>
+            </div>
+            <div class="info-row">
+                <span class="label">Destination:</span>
+                <span id="reportDestination"></span>
+            </div>
+            <div class="info-row">
+                <span class="label">Daily Rate:</span>
+                <span id="reportDailyRate"></span>
+            </div>
+        </div>
+
+        <div class="report-section">
+            <h2>Travel Time Compensation</h2>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Departure</th>
+                        <th>Arrival</th>
+                        <th>Hours</th>
+                        <th>Amount (SEK)</th>
+                    </tr>
+                </thead>
+                <tbody id="reportTravelTimeBody">
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="4">Subtotal</td>
+                        <td id="reportTravelTimeTotal"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="report-section">
+            <h2>Daily Allowances</h2>
+            <table class="report-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Day</th>
+                        <th>Type</th>
+                        <th>Base (SEK)</th>
+                        <th>Deductions</th>
+                        <th>Net (SEK)</th>
+                    </tr>
+                </thead>
+                <tbody id="reportAllowanceBody">
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="5">Subtotal</td>
+                        <td id="reportAllowanceTotal"></td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+
+        <div class="report-summary">
+            <h2>Summary</h2>
+            <div class="summary-box">
+                <div class="summary-line">
+                    <span>Travel Time Compensation:</span>
+                    <span id="reportSummaryTravel"></span>
+                </div>
+                <div class="summary-line">
+                    <span>Daily Allowances:</span>
+                    <span id="reportSummaryAllowance"></span>
+                </div>
+                <div class="summary-line total">
+                    <span>Total Amount:</span>
+                    <span id="reportSummaryTotal"></span>
+                </div>
+            </div>
+        </div>
+
+        <button class="print-button no-print" onclick="window.print()">Print Report</button>
+        <button class="close-button no-print" onclick="closeReport()">Close Report</button>
+    </div>
+
+    <script>
+        // Location data from the provided document
+        const locationData = {
+            "Albanien": 345, "Algeriet": 376, "Amerikanska Samoa": 1020, "Angola": 502,
+            "Anguilla": 1170, "Antigua och Barbuda": 829, "Argentina": 415, "Armenien": 521,
+            "Aruba": 925, "Australien": 833, "Azerbajdzjan": 473, "Bahamas": 1291,
+            "Bahrain": 1011, "Bangladesh": 424, "Barbados": 1067, "Belarus": 290,
+            "Belgien": 924, "Belize": 683, "Benin": 592, "Bermuda": 1361, "Bolivia": 435,
+            "Bonaire": 824, "Bosnien-Hercegovina": 374, "Botswana": 423, "Brasilien": 402,
+            "Brunei Darussalam": 523, "Bulgarien": 449, "Burkina Faso": 460, "Burundi": 389,
+            "Caymanöarna": 993, "Centralafrikanska republiken": 488, "Chile": 521,
+            "Colombia": 343, "Cooköarna": 674, "Costa Rica": 770, "Curacao": 740,
+            "Cypern": 650, "Danmark": 1268, "Djibouti": 699, "Dominikanska republiken": 444,
+            "Ecuador": 660, "Egypten": 290, "Ekvatorialguinea": 701, "Elfenbenskusten": 757,
+            "El Salvador": 537, "Eritrea": 467, "Estland": 731, "Eswatini": 310,
+            "Etiopien": 290, "Fiji": 491, "Filippinerna": 537, "Finland": 952,
+            "Frankrike": 910, "Franska Guyana": 765, "Franska Polynesien": 986,
+            "Förenade Arabemiraten": 1012, "Gabon": 706, "Gambia": 337, "Georgien": 370,
+            "Ghana": 335, "Gibraltar": 702, "Grekland": 746, "Grenada": 677,
+            "Guadeloupe": 772, "Guam": 868, "Guatemala": 650, "Guinea": 658, "Guyana": 738,
+            "Haiti": 838, "Honduras": 511, "Hong Kong": 1018, "Indien": 347,
+            "Indonesien": 518, "Irak": 676, "Irland": 1099, "Island": 1167, "Israel": 947,
+            "Italien": 828, "Jamaica": 494, "Japan": 454, "Jordanien": 925, "Kambodja": 579,
+            "Kamerun": 546, "Kanada": 951, "Kazakstan": 383, "Kenya": 518, "Kina": 672,
+            "Kirgizistan": 290, "Kiribati": 367, "Kongo (Brazzaville)": 741,
+            "Kongo (Demokratiska Rep.)": 650, "Kosovo": 290, "Kroatien": 558, "Kuba": 478,
+            "Kuwait": 882, "Laos": 290, "Lesotho": 290, "Lettland": 804, "Liberia": 711,
+            "Libyen": 290, "Liechtenstein": 1180, "Litauen": 671, "Luxemburg": 1022,
+            "Macao": 682, "Madagaskar": 290, "Malawi": 327, "Malaysia": 332,
+            "Maldiverna": 545, "Mali": 502, "Malta": 658, "Marocko": 506, "Martinique": 811,
+            "Mauretanien": 388, "Mauritius": 383, "Mexiko": 577, 
+            "Mikronesiska federationen": 643, "Mocambique": 440, "Moldavien": 429,
+            "Monaco": 1070, "Mongoliet": 398, "Montenegro": 411, "Myanmar": 336,
+            "Namibia": 311, "Nederländerna": 756, "Nepal": 290, "Nicaragua": 527,
+            "Niger": 410, "Nordmakedonien": 315, "Norge": 1095, "Nya Kaledonien": 923,
+            "Nya Zeeland": 640, "Oman": 944, "Pakistan": 290, "Panama": 757,
+            "Papua Nya Guinea": 598, "Paraguay": 315, "Peru": 484, "Polen": 615,
+            "Portugal": 619, "Puerto Rico": 806, "Qatar": 931, "Réunion": 763,
+            "Rumänien": 462, "Rwanda": 290, "Ryssland": 589, "Saint Lucia": 789,
+            "Saint Vincent och Grenadinerna": 514, "Salomonöarna": 729,
+            "Samoa, Självständiga staten": 616, "Saudiarabien": 1158, "Schweiz": 1402,
+            "Senegal": 673, "Serbien": 515, "Seychellerna": 1011, "Sierra Leone": 391,
+            "Singapore": 961, "Sint Maarten": 831, "Slovakien": 763, "Slovenien": 617,
+            "Spanien": 676, "Sri Lanka": 515, "Storbritannien och Nordirland": 986,
+            "Surinam": 543, "Sydafrika": 383, "Sydkorea": 617, "Tadzjikistan": 290,
+            "Taiwan": 590, "Tanzania": 341, "Tchad": 624, "Thailand": 567, "Tjeckien": 684,
+            "Togo": 560, "Tonga": 498, "Trinidad och Tobago": 923, "Tunisien": 290,
+            "Turkiet": 342, "Turkmenistan": 1628, "Tyskland": 774, "Uganda": 458,
+            "Ukraina": 334, "Ungern": 637, "Uruguay": 604, "USA": 1152, "Uzbekistan": 318,
+            "Vanuatu": 697, "Venezuela": 549, "Vietnam": 404, "Zambia": 322,
+            "Österrike": 781, "Östtimor": 525, "Övriga länder och områden": 499
+        };
+
+        let travelTimes = [];
+        let dailyAllowances = [];
+        let dayCounter = 0;
+
+        // Initialize location select
+        function initializeLocationSelect() {
+            const select = document.getElementById('locationSelect');
+            Object.keys(locationData).sort().forEach(country => {
+                const option = document.createElement('option');
+                option.value = country;
+                option.textContent = country;
+                select.appendChild(option);
+            });
+        }
+
+        // Update location info
+        document.getElementById('locationSelect').addEventListener('change', function() {
+            const country = this.value;
+            const info = document.getElementById('locationInfo');
+            if (country && locationData[country]) {
+                info.textContent = `Daily allowance: ${locationData[country]} SEK`;
+            } else {
+                info.textContent = '';
+            }
+        });
+
+        // Add travel time entry
+        function addTravelTime() {
+            const departure = document.getElementById('departureTime').value;
+            const arrival = document.getElementById('arrivalTime').value;
+            const comment = document.getElementById('comment').value;
+
+            if (!departure || !arrival) {
+                alert('Please fill in both departure and arrival times');
+                return;
+            }
+
+            const depTime = new Date(departure);
+            const arrTime = new Date(arrival);
+            let hours = (arrTime - depTime) / (1000 * 60 * 60);
+            
+            // Handle negative hours (arrival next day)
+            if (hours < 0) {
+                hours += 24;
+            }
+            
+            // Subtract 8 hours work time
+            const billableHours = Math.max(0, hours - 8);
+            const amount = billableHours * 250;
+
+            // Use arrival date as the date for the entry
+            const arrivalDate = arrival.split('T')[0];
+
+            const entry = {
+                date: arrivalDate,
+                departure,
+                arrival,
+                hours: billableHours,
+                amount,
+                comment
+            };
+
+            travelTimes.push(entry);
+            updateTravelTimeTable();
+            
+            // Clear inputs
+            document.getElementById('departureTime').value = '';
+            document.getElementById('arrivalTime').value = '';
+            document.getElementById('comment').value = '';
+        }
+
+        // Update travel time table
+        function updateTravelTimeTable() {
+            const tbody = document.getElementById('travelTimeBody');
+            tbody.innerHTML = '';
+            
+            let total = 0;
+            travelTimes.forEach((entry, index) => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${new Date(entry.date).toLocaleDateString()}</td>
+                    <td>${new Date(entry.departure).toLocaleString()}</td>
+                    <td>${new Date(entry.arrival).toLocaleString()}</td>
+                    <td>${entry.hours.toFixed(1)}</td>
+                    <td>${entry.amount.toFixed(0)} SEK</td>
+                    <td>${entry.comment}</td>
+                    <td><button class="remove-btn" onclick="removeTravelTime(${index})">Remove</button></td>
+                `;
+                total += entry.amount;
+            });
+            
+            document.getElementById('travelTimeTotal').textContent = `${total.toFixed(0)} SEK`;
+            updateSummary();
+        }
+
+        // Remove travel time entry
+        function removeTravelTime(index) {
+            travelTimes.splice(index, 1);
+            updateTravelTimeTable();
+        }
+
+        // Add day for allowance
+        function addDay() {
+            const container = document.getElementById('dailyAllowanceInputs');
+            const dayDiv = document.createElement('div');
+            dayDiv.className = 'day-input';
+            dayDiv.id = `day-${dayCounter}`;
+            
+            dayDiv.innerHTML = `
+                <input type="date" id="dayDate-${dayCounter}" placeholder="Date" onchange="updateDayOfWeek(${dayCounter})">
+                <input type="text" id="dayType-${dayCounter}" readonly placeholder="Day will appear here" style="background: #f0f0f0;">
+                <select id="dayPortion-${dayCounter}">
+                    <option value="full">Full Day</option>
+                    <option value="half">Half Day</option>
+                </select>
+                <div class="meal-deductions">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="breakfast-${dayCounter}">
+                        <label for="breakfast-${dayCounter}">Breakfast provided</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="lunch-${dayCounter}">
+                        <label for="lunch-${dayCounter}">Lunch provided</label>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="dinner-${dayCounter}">
+                        <label for="dinner-${dayCounter}">Dinner provided</label>
+                    </div>
+                </div>
+                <button class="remove-btn" onclick="removeDay(${dayCounter})">Remove</button>
+            `;
+            
+            container.appendChild(dayDiv);
+            dayCounter++;
+        }
+
+        // Update day of week when date is selected
+        function updateDayOfWeek(id) {
+            const dateInput = document.getElementById(`dayDate-${id}`);
+            const dayTypeInput = document.getElementById(`dayType-${id}`);
+            
+            if (dateInput.value) {
+                const date = new Date(dateInput.value);
+                const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+                dayTypeInput.value = days[date.getDay()];
+            } else {
+                dayTypeInput.value = '';
+            }
+        }
+
+        // Remove day
+        function removeDay(id) {
+            const dayDiv = document.getElementById(`day-${id}`);
+            if (dayDiv) {
+                dayDiv.remove();
+            }
+        }
+
+        // Calculate allowance
+        function calculateAllowance() {
+            const country = document.getElementById('locationSelect').value;
+            if (!country) {
+                alert('Please select a travel destination');
+                return;
+            }
+            
+            const baseAmount = locationData[country];
+            dailyAllowances = [];
+            
+            // Collect all day inputs
+            for (let i = 0; i < dayCounter; i++) {
+                const dayDiv = document.getElementById(`day-${i}`);
+                if (!dayDiv) continue;
+                
+                const dayType = document.getElementById(`dayType-${i}`).value;
+                const date = document.getElementById(`dayDate-${i}`).value;
+                const portion = document.getElementById(`dayPortion-${i}`).value;
+                const breakfast = document.getElementById(`breakfast-${i}`).checked;
+                const lunch = document.getElementById(`lunch-${i}`).checked;
+                const dinner = document.getElementById(`dinner-${i}`).checked;
+                
+                if (!date) continue;
+                
+                let dayAmount = portion === 'half' ? baseAmount / 2 : baseAmount;
+                let deductions = 0;
+                
+                if (breakfast) deductions += dayAmount * 0.15;
+                if (lunch) deductions += dayAmount * 0.35;
+                if (dinner) deductions += dayAmount * 0.35;
+                
+                const netAmount = dayAmount - deductions;
+                
+                dailyAllowances.push({
+                    day: dayType,
+                    date,
+                    portion,
+                    baseAmount: dayAmount,
+                    breakfast: breakfast ? dayAmount * 0.15 : 0,
+                    lunch: lunch ? dayAmount * 0.35 : 0,
+                    dinner: dinner ? dayAmount * 0.35 : 0,
+                    netAmount
+                });
+            }
+            
+            updateAllowanceTable();
+        }
+
+        // Update allowance table
+        function updateAllowanceTable() {
+            const table = document.getElementById('allowanceTable');
+            const tbody = document.getElementById('allowanceBody');
+            tbody.innerHTML = '';
+            
+            let total = 0;
+            dailyAllowances.forEach(entry => {
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>${entry.day}</td>
+                    <td>${new Date(entry.date).toLocaleDateString()}</td>
+                    <td>${entry.portion === 'half' ? 'Half Day' : 'Full Day'}</td>
+                    <td>${entry.baseAmount.toFixed(1)} SEK</td>
+                    <td>${entry.breakfast > 0 ? `-${entry.breakfast.toFixed(1)}` : '-'}</td>
+                    <td>${entry.lunch > 0 ? `-${entry.lunch.toFixed(1)}` : '-'}</td>
+                    <td>${entry.dinner > 0 ? `-${entry.dinner.toFixed(1)}` : '-'}</td>
+                    <td>${entry.netAmount.toFixed(1)} SEK</td>
+                `;
+                total += entry.netAmount;
+            });
+            
+            document.getElementById('allowanceTotal').textContent = `${total.toFixed(1)} SEK`;
+            table.style.display = 'table';
+            updateSummary();
+        }
+
+        // Update summary
+        function updateSummary() {
+            const travelTotal = travelTimes.reduce((sum, entry) => sum + entry.amount, 0);
+            const allowanceTotal = dailyAllowances.reduce((sum, entry) => sum + entry.netAmount, 0);
+            const grandTotal = travelTotal + allowanceTotal;
+            
+            document.getElementById('summaryTravelTime').textContent = `${travelTotal.toFixed(0)} SEK`;
+            document.getElementById('summaryAllowance').textContent = `${allowanceTotal.toFixed(1)} SEK`;
+            document.getElementById('summaryTotal').textContent = `${grandTotal.toFixed(1)} SEK`;
+            
+            document.getElementById('summary').style.display = 'block';
+        }
+
+        // Save location data to JSON
+        function saveToJSON() {
+            const dataStr = JSON.stringify(locationData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = 'loc.json';
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // Export calculation
+        function exportCalculation() {
+            const companyName = document.getElementById('companyName').value || 'Company';
+            const country = document.getElementById('locationSelect').value;
+            
+            // Calculate week number and generate trip name
+            let weekNumber = '';
+            if (dailyAllowances.length > 0 || travelTimes.length > 0) {
+                let firstDate;
+                if (dailyAllowances.length > 0) {
+                    firstDate = new Date(dailyAllowances[0].date);
+                } else if (travelTimes.length > 0) {
+                    firstDate = new Date(travelTimes[0].date);
+                }
+                
+                const startOfYear = new Date(firstDate.getFullYear(), 0, 1);
+                const days = Math.floor((firstDate - startOfYear) / (24 * 60 * 60 * 1000));
+                weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+            }
+            
+            const year = new Date().getFullYear().toString().substr(-2);
+            const tripName = `w${weekNumber}${year}- ${companyName}, ${country}`;
+            
+            const exportData = {
+                tripName,
+                company: companyName,
+                country,
+                date: new Date().toISOString(),
+                travelTimes,
+                dailyAllowances,
+                summary: {
+                    travelTimeTotal: travelTimes.reduce((sum, entry) => sum + entry.amount, 0),
+                    allowanceTotal: dailyAllowances.reduce((sum, entry) => sum + entry.netAmount, 0),
+                    grandTotal: travelTimes.reduce((sum, entry) => sum + entry.amount, 0) + 
+                               dailyAllowances.reduce((sum, entry) => sum + entry.netAmount, 0)
+                }
+            };
+            
+            const dataStr = JSON.stringify(exportData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `${tripName.replace(/[^a-z0-9]/gi, '_')}_${new Date().toISOString().split('T')[0]}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+
+        // Initialize on load
+        window.onload = function() {
+            initializeLocationSelect();
+            // Add first day by default
+            addDay();
+        };
+
+        // Generate printable report
+        function generateReport() {
+            const companyName = document.getElementById('companyName').value || 'Company';
+            const country = document.getElementById('locationSelect').value;
+            
+            if (!country || (travelTimes.length === 0 && dailyAllowances.length === 0)) {
+                alert('Please complete the calculation before generating a report');
+                return;
+            }
+
+            // Calculate week number from dates
+            let weekNumber = '';
+            if (dailyAllowances.length > 0 || travelTimes.length > 0) {
+                // Get the first date from either allowances or travel times
+                let firstDate;
+                if (dailyAllowances.length > 0) {
+                    firstDate = new Date(dailyAllowances[0].date);
+                } else if (travelTimes.length > 0) {
+                    firstDate = new Date(travelTimes[0].date);
+                }
+                
+                // Calculate week number
+                const startOfYear = new Date(firstDate.getFullYear(), 0, 1);
+                const days = Math.floor((firstDate - startOfYear) / (24 * 60 * 60 * 1000));
+                weekNumber = Math.ceil((days + startOfYear.getDay() + 1) / 7);
+            }
+
+            // Generate trip name: w[week][year]- [company], [country]
+            const year = new Date().getFullYear().toString().substr(-2);
+            const tripName = `w${weekNumber}${year}- ${companyName}, ${country}`;
+
+            // Update report header
+            document.getElementById('reportDate').textContent = new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            document.getElementById('reportTripName').textContent = tripName;
+            document.getElementById('reportDestination').textContent = country;
+            document.getElementById('reportDailyRate').textContent = `${locationData[country]} SEK`;
+
+            // Update travel time section
+            const travelTimeBody = document.getElementById('reportTravelTimeBody');
+            travelTimeBody.innerHTML = '';
+            let travelTotal = 0;
+
+            travelTimes.forEach(entry => {
+                const row = travelTimeBody.insertRow();
+                const depDate = new Date(entry.departure);
+                const arrDate = new Date(entry.arrival);
+                
+                row.innerHTML = `
+                    <td>${new Date(entry.date).toLocaleDateString()}</td>
+                    <td>${depDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td>${arrDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' })}</td>
+                    <td>${entry.hours.toFixed(1)}</td>
+                    <td>${entry.amount.toFixed(0)} SEK</td>
+                `;
+                travelTotal += entry.amount;
+            });
+
+            document.getElementById('reportTravelTimeTotal').textContent = `${travelTotal.toFixed(0)} SEK`;
+
+            // Update allowance section
+            const allowanceBody = document.getElementById('reportAllowanceBody');
+            allowanceBody.innerHTML = '';
+            let allowanceTotal = 0;
+
+            dailyAllowances.forEach(entry => {
+                const row = allowanceBody.insertRow();
+                const deductions = [];
+                if (entry.breakfast > 0) deductions.push('Breakfast');
+                if (entry.lunch > 0) deductions.push('Lunch');
+                if (entry.dinner > 0) deductions.push('Dinner');
+                
+                row.innerHTML = `
+                    <td>${new Date(entry.date).toLocaleDateString()}</td>
+                    <td>${entry.day}</td>
+                    <td>${entry.portion === 'half' ? 'Half Day' : 'Full Day'}</td>
+                    <td>${entry.baseAmount.toFixed(0)}</td>
+                    <td>${deductions.length > 0 ? deductions.join(', ') : 'None'}</td>
+                    <td>${entry.netAmount.toFixed(0)} SEK</td>
+                `;
+                allowanceTotal += entry.netAmount;
+            });
+
+            document.getElementById('reportAllowanceTotal').textContent = `${allowanceTotal.toFixed(0)} SEK`;
+
+            // Update summary
+            const grandTotal = travelTotal + allowanceTotal;
+            document.getElementById('reportSummaryTravel').textContent = `${travelTotal.toFixed(0)} SEK`;
+            document.getElementById('reportSummaryAllowance').textContent = `${allowanceTotal.toFixed(0)} SEK`;
+            document.getElementById('reportSummaryTotal').textContent = `${grandTotal.toFixed(0)} SEK`;
+
+            // Show report
+            document.getElementById('printableReport').style.display = 'block';
+        }
+
+        // Close report
+        function closeReport() {
+            document.getElementById('printableReport').style.display = 'none';
+        }
+
+        // Add keyboard shortcut for printing
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'p' && document.getElementById('printableReport').style.display === 'block') {
+                e.preventDefault();
+                window.print();
+            }
+        });
+    </script>
+</body>
+</html>
