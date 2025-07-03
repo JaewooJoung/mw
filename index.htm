@@ -14,9 +14,37 @@
             color: #333;
         }
         
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
         h1 {
             color: #2c3e50;
-            margin-bottom: 30px;
+            margin: 0;
+        }
+        
+        .refresh-btn {
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background-color 0.2s;
+        }
+        
+        .refresh-btn:hover {
+            background-color: #0052a3;
+        }
+        
+        .refresh-btn:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
         }
         
         .error {
@@ -83,7 +111,11 @@
     </style>
 </head>
 <body>
-    <h1>File Index</h1>
+    <div class="header">
+        <h1>File Index</h1>
+        <button class="refresh-btn" onclick="loadFiles()">Refresh</button>
+    </div>
+    
     <div id="content">
         <div class="loading">Loading files...</div>
     </div>
@@ -124,21 +156,41 @@
             content.innerHTML = `<div class="error">Error: ${message}</div>`;
         }
 
-        // Fetch and display the files
-        fetch('/mw/list.json')
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                renderFiles(data);
-            })
-            .catch(error => {
-                console.error('Error loading list.json:', error);
-                showError('Could not load list.json. Make sure the file exists and is valid JSON.');
-            });
+        // Function to load files
+        function loadFiles() {
+            const content = document.getElementById('content');
+            const refreshBtn = document.querySelector('.refresh-btn');
+            
+            // Show loading state
+            content.innerHTML = '<div class="loading">Loading files...</div>';
+            refreshBtn.disabled = true;
+            refreshBtn.textContent = 'Loading...';
+            
+            // Add cache-busting parameter to ensure fresh data
+            const timestamp = new Date().getTime();
+            fetch(`/mw/list.json?_=${timestamp}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    renderFiles(data);
+                })
+                .catch(error => {
+                    console.error('Error loading list.json:', error);
+                    showError('Could not load list.json. Make sure the file exists and is valid JSON.');
+                })
+                .finally(() => {
+                    // Reset button state
+                    refreshBtn.disabled = false;
+                    refreshBtn.textContent = 'Refresh';
+                });
+        }
+
+        // Load files on page load
+        loadFiles();
     </script>
 </body>
 </html>
