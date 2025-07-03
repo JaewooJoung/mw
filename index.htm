@@ -64,6 +64,9 @@
         }
         
         .file-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             padding: 15px 20px;
             border-bottom: 1px solid #eee;
             transition: background-color 0.2s;
@@ -81,11 +84,17 @@
             text-decoration: none;
             color: #0066cc;
             font-weight: 500;
-            display: block;
+            flex-grow: 1;
         }
         
         .file-item a:hover {
             text-decoration: underline;
+        }
+        
+        .file-name {
+            color: #666;
+            font-size: 14px;
+            white-space: nowrap;
         }
         
         .loading {
@@ -124,6 +133,7 @@
             const fileListHTML = files.map(file => `
                 <div class="file-item">
                     <a href="${file.link}">${file.name}</a>
+                    <span class="file-name">${file.link}</span>
                 </div>
             `).join('');
             
