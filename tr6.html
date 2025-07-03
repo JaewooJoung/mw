@@ -74,6 +74,28 @@
             border-color: #3498db;
         }
 
+        /* Custom time picker styles */
+        .custom-datetime {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .custom-datetime input[type="date"] {
+            flex: 1;
+        }
+
+        .custom-datetime select {
+            width: auto;
+            min-width: 70px;
+        }
+
+        .time-separator {
+            font-weight: bold;
+            font-size: 18px;
+            color: #2c3e50;
+        }
+
         /* Force 24-hour format for datetime inputs */
         input[type="datetime-local"] {
             position: relative;
@@ -463,14 +485,36 @@
             <h2>Travel Time Calculation</h2>
             <div class="input-group">
                 <label for="departureTime">Departure Time</label>
-                <input type="datetime-local" id="departureTime" step="1800">
-                <div class="time-hint">Use 24-hour format - minutes: 00 or 30 only (e.g., 14:30, 09:00)</div>
+                <div class="custom-datetime">
+                    <input type="date" id="departureDate" required>
+                    <select id="departureHour" required>
+                        <option value="">Hour</option>
+                    </select>
+                    <span class="time-separator">:</span>
+                    <select id="departureMinute" required>
+                        <option value="">Min</option>
+                        <option value="00">00</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+                <div class="time-hint">Select date, hour (24-hour format), and minutes (00 or 30)</div>
             </div>
             
             <div class="input-group">
                 <label for="arrivalTime">Arrival Time</label>
-                <input type="datetime-local" id="arrivalTime" step="1800">
-                <div class="time-hint">Use 24-hour format - minutes: 00 or 30 only (e.g., 22:00, 15:30)</div>
+                <div class="custom-datetime">
+                    <input type="date" id="arrivalDate" required>
+                    <select id="arrivalHour" required>
+                        <option value="">Hour</option>
+                    </select>
+                    <span class="time-separator">:</span>
+                    <select id="arrivalMinute" required>
+                        <option value="">Min</option>
+                        <option value="00">00</option>
+                        <option value="30">30</option>
+                    </select>
+                </div>
+                <div class="time-hint">Select date, hour (24-hour format), and minutes (00 or 30)</div>
             </div>
             
             <div class="input-group">
@@ -750,31 +794,52 @@
             }
         });
 
+        // Function to populate hour options (24-hour format)
+        function populateHourOptions() {
+            const departureHour = document.getElementById('departureHour');
+            const arrivalHour = document.getElementById('arrivalHour');
+            
+            for (let i = 0; i < 24; i++) {
+                const hour = i.toString().padStart(2, '0');
+                
+                const depOption = document.createElement('option');
+                depOption.value = hour;
+                depOption.textContent = hour;
+                departureHour.appendChild(depOption);
+                
+                const arrOption = document.createElement('option');
+                arrOption.value = hour;
+                arrOption.textContent = hour;
+                arrivalHour.appendChild(arrOption);
+            }
+        }
+
+        // Function to get datetime string from custom inputs
+        function getCustomDateTime(dateId, hourId, minuteId) {
+            const date = document.getElementById(dateId).value;
+            const hour = document.getElementById(hourId).value;
+            const minute = document.getElementById(minuteId).value;
+            
+            if (!date || !hour || minute === '') {
+                return null;
+            }
+            
+            return `${date}T${hour}:${minute}:00`;
+        }
+
         // Add travel time entry
         function addTravelTime() {
-            const departure = document.getElementById('departureTime').value;
-            const arrival = document.getElementById('arrivalTime').value;
+            const departure = getCustomDateTime('departureDate', 'departureHour', 'departureMinute');
+            const arrival = getCustomDateTime('arrivalDate', 'arrivalHour', 'arrivalMinute');
             const comment = document.getElementById('comment').value;
 
             if (!departure || !arrival) {
-                alert('Please fill in both departure and arrival times');
+                alert('Please fill in all departure and arrival time fields');
                 return;
             }
 
-            // Validate that minutes are either 00 or 30
             const depTime = new Date(departure);
             const arrTime = new Date(arrival);
-            
-            if (depTime.getMinutes() !== 0 && depTime.getMinutes() !== 30) {
-                alert('Departure time minutes must be either 00 or 30');
-                return;
-            }
-            
-            if (arrTime.getMinutes() !== 0 && arrTime.getMinutes() !== 30) {
-                alert('Arrival time minutes must be either 00 or 30');
-                return;
-            }
-
             let hours = (arrTime - depTime) / (1000 * 60 * 60);
             
             // Handle negative hours (arrival next day)
@@ -802,8 +867,12 @@
             updateTravelTimeTable();
             
             // Clear inputs
-            document.getElementById('departureTime').value = '';
-            document.getElementById('arrivalTime').value = '';
+            document.getElementById('departureDate').value = '';
+            document.getElementById('departureHour').value = '';
+            document.getElementById('departureMinute').value = '';
+            document.getElementById('arrivalDate').value = '';
+            document.getElementById('arrivalHour').value = '';
+            document.getElementById('arrivalMinute').value = '';
             document.getElementById('comment').value = '';
         }
 
@@ -1048,51 +1117,9 @@
         // Initialize on load
         window.onload = function() {
             initializeLocationSelect();
+            populateHourOptions();
             // Add first day by default
             addDay();
-            
-            // Force 24-hour format and 30-minute intervals
-            const timeInputs = document.querySelectorAll('input[type="datetime-local"]');
-            timeInputs.forEach(input => {
-                // Set a placeholder to guide users
-                input.setAttribute('data-format', '24-hour');
-                
-                // Add event listener to ensure 24-hour format
-                input.addEventListener('focus', function() {
-                    // This helps ensure the picker opens in 24-hour mode
-                    this.showPicker && this.showPicker();
-                });
-                
-                // Add event listener to validate minutes on input
-                input.addEventListener('input', function() {
-                    const value = this.value;
-                    if (value) {
-                        const date = new Date(value);
-                        const minutes = date.getMinutes();
-                        
-                        // If minutes are not 00 or 30, round to nearest valid value
-                        if (minutes !== 0 && minutes !== 30) {
-                            if (minutes < 15) {
-                                date.setMinutes(0);
-                            } else if (minutes < 45) {
-                                date.setMinutes(30);
-                            } else {
-                                date.setMinutes(0);
-                                date.setHours(date.getHours() + 1);
-                            }
-                            
-                            // Format the corrected date back to datetime-local format
-                            const year = date.getFullYear();
-                            const month = String(date.getMonth() + 1).padStart(2, '0');
-                            const day = String(date.getDate()).padStart(2, '0');
-                            const hours = String(date.getHours()).padStart(2, '0');
-                            const mins = String(date.getMinutes()).padStart(2, '0');
-                            
-                            this.value = `${year}-${month}-${day}T${hours}:${mins}`;
-                        }
-                    }
-                });
-            });
         };
 
         // Generate printable report
