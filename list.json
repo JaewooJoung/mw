@@ -1,12 +1,10 @@
-[
+ [
     {
         "name": "My HR",
-        "link": "hr.html",
-        "modified": "202507031307"
+        "link": "hr.html"
     },
     {
         "name": "my Travle",
-        "link": "tr4.html",
-        "modified": "202507031316"
+        "link": "tr4.html"
     }
 ]
