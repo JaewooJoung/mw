@@ -441,7 +441,7 @@
     </div>
 
     <script>
-        // JSON data structure
+        // Employee data
         const employeeData = [
             {
                 "empId": "1",
@@ -541,6 +541,7 @@
             }
         ];
 
+        // Global variables
         let filteredData = [...employeeData];
         let currentView = 'table';
         let isLoggedIn = false;
@@ -570,18 +571,6 @@
             document.getElementById('passwordInput').value = '';
             document.getElementById('loginError').style.display = 'none';
         }
-
-        // Add Enter key support for login
-        document.addEventListener('DOMContentLoaded', function() {
-            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    login();
-                }
-            });
-        });
-
-        let filteredData = [...employeeData];
-        let currentView = 'table';
 
         // Initialize the application
         function init() {
@@ -799,12 +788,19 @@
             displayData();
         }
 
-        // Initialize the application when page loads
-        window.onload = function() {
+        // Initialize when page loads
+        document.addEventListener('DOMContentLoaded', function() {
             // Show login screen first
             document.getElementById('loginScreen').style.display = 'flex';
             document.getElementById('passwordInput').focus();
-        };
+            
+            // Add Enter key support for login
+            document.getElementById('passwordInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    login();
+                }
+            });
+        });
     </script>
 </body>
 </html>
